@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Product Store</title>
+  <title>Sasquatch Muscle Store</title>
   <style>
     body { font-family: system-ui, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; color: #222; background-color: #eaf6ec; }
+    .banner-wrapper { margin-bottom: 1.5rem; border-radius: 10px; overflow: hidden; border: 1px solid #c3dcc7; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12); background: #0f2419; }
+    .banner-img { width: 100%; height: auto; display: block; object-fit: cover; }
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
     .card { background: #ffffff; border: 1px solid #c3dcc7; border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; justify-content: space-between; }
     button { background: #0969da; color: white; border: none; padding: 0.6rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.95rem; margin-right: 0.5rem; margin-top: 0.5rem; }
@@ -38,6 +40,10 @@
   </style>
 </head>
 <body>
+
+  <div class="banner-wrapper">
+    <img src="banner.png" alt="Sasquatch Muscle" class="banner-img">
+  </div>
 
   <h1>Product Catalog</h1>
   <div class="grid" id="product-list"></div>
@@ -226,97 +232,94 @@
         { id: "cust-state", label: "State" },
         { id: "cust-zip", label: "Zip Code" },
         { id: "cust-payment", label: "Payment Method" }
-      ];
-
-      let missing = [];
-      const errorBanner = document.getElementById("form-error-msg");
-
-      fields.forEach(function(f) {
+        ];
+        let missing = [];
+        const errorBanner = document.getElementById("form-error-msg");
+        fields.forEach(function(f) {
         const el = document.getElementById(f.id);
         const val = el.value.trim();
-
         if (!val) {
-          el.classList.add("input-error");
-      missing.push(f.label);
-      } else if (f.id === "cust-email" && (!val.includes("@") || !val.includes("."))) {
-      el.classList.add("input-error");
-      missing.push("Valid Email Address");
-      } else {
-      el.classList.remove("input-error");
-      }
-      });
-      if (missing.length > 0) {
-      errorBanner.textContent = "Please complete all required fields: " + missing.join(", ") + ".";
-      errorBanner.classList.remove("hidden");
-      document.getElementById("output-section").classList.add("hidden");
-      return false;
-      }
-      errorBanner.classList.add("hidden");
-      return true;
-      }
-      function generateOrder() {
-      if (cart.length === 0) {
-      alert("Please add at least one item to your cart first.");
-      return;
-      }
-      if (!validateForm()) {
-      return;
-      }
-      currentOrderId = createOrderNumber();
-      document.getElementById("display-order-id").textContent = currentOrderId;
-      const name = document.getElementById("cust-name").value.trim();
-      const email = document.getElementById("cust-email").value.trim();
-      const address = document.getElementById("cust-address").value.trim();
-      const city = document.getElementById("cust-city").value.trim();
-      const state = document.getElementById("cust-state").value.trim();
-      const zip = document.getElementById("cust-zip").value.trim();
-      const payment = document.getElementById("cust-payment").value;
-      let subtotal = 0;
-      let lines = [
-      "NEW ORDER REQUEST",
-      "Order Number: " + currentOrderId,
-      "-------------------------",
-      "Name: " + name,
-      "Email: " + email,
-      "Address: " + address,
-      "City/State/Zip: " + city + ", " + state + " " + zip,
-      "Payment Method: " + payment,
-      "-------------------------",
-      "ITEMS:"
-      ];
-      cart.forEach(function(item) {
-      const lineTotal = item.price * item.qty;
-      subtotal += lineTotal;
-      lines.push(item.qty + "x " + item.name + " @ $" + item.price.toFixed(2) + " = $" + lineTotal.toFixed(2));
-      });
-      const total = subtotal + flatShippingRate;
-      lines.push("-------------------------");
-      lines.push("Subtotal: $" + subtotal.toFixed(2));
-      lines.push("Shipping (Flat Rate): $" + flatShippingRate.toFixed(2));
-      lines.push("ORDER TOTAL: $" + total.toFixed(2));
-      document.getElementById("order-text").value = lines.join("\n");
-      document.getElementById("output-section").classList.remove("hidden");
-      }
-      function sendViaEmail() {
-      const orderBody = document.getElementById("order-text").value;
-      const customerName = document.getElementById("cust-name").value.trim();
-      const subject = encodeURIComponent("Order " + currentOrderId + " from " + customerName);
-      const body = encodeURIComponent(orderBody);
-      window.location.href = "mailto:" + storeEmail + "?subject=" + subject + "&body=" + body;
-      }
-      function copyText() {
-      const box = document.getElementById("order-text");
-      box.select();
-      navigator.clipboard.writeText(box.value);
-      alert("Order " + currentOrderId + " copied! Paste it into an email to " + storeEmail);
-      }
-      function clearCart() {
-      cart = [];
-      currentOrderId = "";
-      updateCart();
-      document.getElementById("form-error-msg").classList.add("hidden");
-      }
-      document.addEventListener("DOMContentLoaded", renderProducts);
+        el.classList.add("input-error");
+        missing.push(f.label);
+        } else if (f.id === "cust-email" && (!val.includes("@") || !val.includes("."))) {
+        el.classList.add("input-error");
+        missing.push("Valid Email Address");
+        } else {
+        el.classList.remove("input-error");
+        }
+        });
+        if (missing.length > 0) {
+        errorBanner.textContent = "Please complete all required fields: " + missing.join(", ") + ".";
+        errorBanner.classList.remove("hidden");
+        document.getElementById("output-section").classList.add("hidden");
+        return false;
+        }
+        errorBanner.classList.add("hidden");
+        return true;
+        }
+        function generateOrder() {
+        if (cart.length === 0) {
+        alert("Please add at least one item to your cart first.");
+        return;
+        }
+        if (!validateForm()) {
+        return;
+        }
+        currentOrderId = createOrderNumber();
+        document.getElementById("display-order-id").textContent = currentOrderId;
+        const name = document.getElementById("cust-name").value.trim();
+        const email = document.getElementById("cust-email").value.trim();
+        const address = document.getElementById("cust-address").value.trim();
+        const city = document.getElementById("cust-city").value.trim();
+        const state = document.getElementById("cust-state").value.trim();
+        const zip = document.getElementById("cust-zip").value.trim();
+        const payment = document.getElementById("cust-payment").value;
+        let subtotal = 0;
+        let lines = [
+        "NEW ORDER REQUEST",
+        "Order Number: " + currentOrderId,
+        "-------------------------",
+        "Name: " + name,
+        "Email: " + email,
+        "Address: " + address,
+        "City/State/Zip: " + city + ", " + state + " " + zip,
+        "Payment Method: " + payment,
+        "-------------------------",
+        "ITEMS:"
+        ];
+        cart.forEach(function(item) {
+        const lineTotal = item.price * item.qty;
+        subtotal += lineTotal;
+        lines.push(item.qty + "x " + item.name + " @ $" + item.price.toFixed(2) + " = $" + lineTotal.toFixed(2));
+        });
+        const total = subtotal + flatShippingRate;
+        lines.push("-------------------------");
+        lines.push("Subtotal: $" + subtotal.toFixed(2));
+        lines.push("Shipping (Flat Rate): $" + flatShippingRate.toFixed(2));
+        lines.push("ORDER TOTAL: $" + total.toFixed(2));
+        document.getElementById("order-text").value = lines.join("\n");
+        document.getElementById("output-section").classList.remove("hidden");
+        }
+        function sendViaEmail() {
+        const orderBody = document.getElementById("order-text").value;
+        const customerName = document.getElementById("cust-name").value.trim();
+        const subject = encodeURIComponent("Order " + currentOrderId + " from " + customerName);
+        const body = encodeURIComponent(orderBody);
+        window.location.href = "mailto:" + storeEmail + "?subject=" + subject + "&body=" + body;
+        }
+        function copyText() {
+        const box = document.getElementById("order-text");
+        box.select();
+        navigator.clipboard.writeText(box.value);
+        alert("Order " + currentOrderId + " copied! Paste it into an email to " + storeEmail);
+        }
+        function clearCart() {
+        cart = [];
+        currentOrderId = "";
+        updateCart();
+        document.getElementById("form-error-msg").classList.add("hidden");
+        }
+        document.addEventListener("DOMContentLoaded", renderProducts);
           renderProducts();
   </script>
 </body>
