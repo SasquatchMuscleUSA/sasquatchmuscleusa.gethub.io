@@ -74,27 +74,27 @@
       </select>
     </div>
 
-    <button onclick="generateOrder()">Submit & Generate Order</button>
-    <button class="secondary" onclick="clearCart()">Clear Cart</button>
+    <button type="button" onclick="generateOrder()">Submit &amp; Generate Order</button>
+    <button type="button" class="secondary" onclick="clearCart()">Clear Cart</button>
 
     <div id="output-section" class="hidden">
       <h4>Order Summary:</h4>
       <textarea id="order-text" readonly></textarea>
       <div>
-        <button class="success" onclick="sendViaEmail()">Send via Email</button>
-        <button onclick="copyText()">Copy to Clipboard</button>
+        <button type="button" class="success" onclick="sendViaEmail()">Send via Email</button>
+        <button type="button" onclick="copyText()">Copy to Clipboard</button>
       </div>
     </div>
   </div>
 
   <script>
-    // 1. Replace this with the email address where you want to receive orders
+    // 1. Replace this with your receiving email address
     const storeEmail = "orders@example.com";
 
     // 2. Flat-rate shipping fee
     const flatShippingRate = 20.00;
 
-    // 3. Edit your products, prices, and descriptions here
+    // 3. Edit your products here (make sure each item ends with a comma except the last one)
     const products = [
       { id: 1, name: "Canvas Tote Bag", price: 18.00, desc: "Heavyweight cotton tote." },
       { id: 2, name: "Ceramic Coffee Mug", price: 14.50, desc: "12 oz speckled glaze mug." },
@@ -105,33 +105,39 @@
 
     function renderProducts() {
       const list = document.getElementById("product-list");
-      list.innerHTML = products.map(p => `
-        <div class="card">
-          <div>
-            <h3>${p.name}</h3>
-            <p>${p.desc}</p>
+      if (!list) return;
+
+      list.innerHTML = products.map(function(p) {
+        return `
+          <div class="card">
+            <div>
+              <h3>${p.name}</h3>
+              <p>${p.desc}</p>
+            </div>
+            <div>
+              <p><strong>$${Number(p.price).toFixed(2)}</strong></p>
+              <button type="button" onclick="addToCart(${p.id})">Add to Cart</button>
+            </div>
           </div>
-          <div>
-            <p><strong>$${p.price.toFixed(2)}</strong></p>
-            <button onclick="addToCart(${p.id})">Add to Cart</button>
-          </div>
-        </div>
-      `).join("");
+        `;
+      }).join("");
     }
 
     function addToCart(id) {
-      const product = products.find(p => p.id === id);
-      const existing = cart.find(item => item.id === id);
+      const product = products.find(function(p) { return p.id === id; });
+      if (!product) return;
+
+      const existing = cart.find(function(item) { return item.id === id; });
       if (existing) {
         existing.qty += 1;
       } else {
-        cart.push({ ...product, qty: 1 });
+        cart.push({ id: product.id, name: product.name, price: Number(product.price), qty: 1 });
       }
       updateCart();
     }
 
     function changeQty(id, delta) {
-      const item = cart.find(i => i.id === id);
+      const item = cart.find(function(i) { return i.id === id; });
       if (!item) return;
       item.qty += delta;
       if (item.qty <= 0) {
@@ -142,7 +148,7 @@
     }
 
     function removeItem(id) {
-      cart = cart.filter(item => item.id !== id);
+      cart = cart.filter(function(item) { return item.id !== id; });
       updateCart();
     }
 
@@ -162,21 +168,23 @@
       }
 
       let subtotal = 0;
-      container.innerHTML = cart.map(item => {
+      container.innerHTML = cart.map(function(item) {
         const lineTotal = item.price * item.qty;
         subtotal += lineTotal;
-        return `<div class="cart-item">
-          <div>
-            <strong>${item.name}</strong> ($${item.price.toFixed(2)} each)
+        return `
+          <div class="cart-item">
+            <div>
+              <strong>${item.name}</strong> ($${item.price.toFixed(2)} each)
+            </div>
+            <div class="cart-controls">
+              <button type="button" class="secondary qty-btn" onclick="changeQty(${item.id}, -1)">-</button>
+              <span style="min-width: 24px; text-align: center;">${item.qty}</span>
+              <button type="button" class="secondary qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
+              <span style="min-width: 75px; text-align: right; margin: 0 0.5rem;">$${lineTotal.toFixed(2)}</span>
+              <button type="button" class="danger qty-btn" onclick="removeItem(${item.id})">Remove</button>
+            </div>
           </div>
-          <div class="cart-controls">
-            <button class="secondary qty-btn" onclick="changeQty(${item.id}, -1)">-</button>
-            <span style="min-width: 24px; text-align: center;">${item.qty}</span>
-            <button class="secondary qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
-            <span style="min-width: 75px; text-align: right; margin: 0 0.5rem;">$${lineTotal.toFixed(2)}</span>
-            <button class="danger qty-btn" onclick="removeItem(${item.id})">Remove</button>
-          </div>
-        </div>`;
+        `;
       }).join("");
 
       const total = subtotal + flatShippingRate;
@@ -203,27 +211,27 @@
       let lines = [
         "NEW ORDER REQUEST",
         "-------------------------",
-        `Name: ${name}`,
-        `Email: ${email}`,
-        `Address: ${address}`,
-        `City/State/Zip: ${city}, ${state} ${zip}`.trim(),
-        `Payment Method: ${payment}`,
+        "Name: " + name,
+        "Email: " + email,
+        "Address: " + address,
+        "City/State/Zip: " + (city + ", " + state + " " + zip).trim(),
+        "Payment Method: " + payment,
         "-------------------------",
         "ITEMS:"
       ];
 
-      cart.forEach(item => {
+      cart.forEach(function(item) {
         const lineTotal = item.price * item.qty;
         subtotal += lineTotal;
-        lines.push(`${item.qty}x ${item.name} @ $${item.price.toFixed(2)} = $${lineTotal.toFixed(2)}`);
+        lines.push(item.qty + "x " + item.name + " @ $" + item.price.toFixed(2) + " = $" + lineTotal.toFixed(2));
       });
 
       const total = subtotal + flatShippingRate;
 
       lines.push("-------------------------");
-      lines.push(`Subtotal: $${subtotal.toFixed(2)}`);
-      lines.push(`Shipping (Flat Rate): $${flatShippingRate.toFixed(2)}`);
-      lines.push(`ORDER TOTAL: $${total.toFixed(2)}`);
+      lines.push("Subtotal: $" + subtotal.toFixed(2));
+      lines.push("Shipping (Flat Rate): $" + flatShippingRate.toFixed(2));
+      lines.push("ORDER TOTAL: $" + total.toFixed(2));
 
       document.getElementById("order-text").value = lines.join("\n");
       document.getElementById("output-section").classList.remove("hidden");
@@ -232,12 +240,17 @@
     function sendViaEmail() {
       const orderBody = document.getElementById("order-text").value;
       const customerName = document.getElementById("cust-name").value.trim() || "Customer";
-      const subject = encodeURIComponent(`New Order from ${customerName}`);
+      const subject = encodeURIComponent("New Order from " + customerName);
       const body = encodeURIComponent(orderBody);
-      window.location.href = `mailto:${storeEmail}?subject=${subject}&body=${body}`;
-    }
-
-    function copyText() {
+      window.location.href = "mailto:" + storeEmail + "?subject=" + subject + "&body=" + body;
+      }
+      function copyText() {
       const box = document.getElementById("order-text");
       box.select();
-
+      navigator.clipboard.writeText(box.value);
+      alert("Order copied! Paste it into your email.");
+      }
+      function clearCart() {
+      cart = [];
+      updateCart();
+      }
