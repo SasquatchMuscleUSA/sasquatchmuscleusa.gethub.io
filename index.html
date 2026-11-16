@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Product Store</title>
   <style>
-    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; color: #222; }
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; color: #222; background-color: #eaf6ec; }
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-    .card { border: 1px solid #ddd; border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; justify-content: space-between; }
+    .card { background: #ffffff; border: 1px solid #c3dcc7; border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; justify-content: space-between; }
     button { background: #0969da; color: white; border: none; padding: 0.6rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.95rem; margin-right: 0.5rem; margin-top: 0.5rem; }
     button:hover { background: #0550ae; }
     button.secondary { background: #6e7781; }
@@ -17,7 +17,7 @@
     button.danger { background: #cf222e; }
     button.danger:hover { background: #a40e26; }
     button.qty-btn { padding: 0.25rem 0.6rem; margin: 0 0.25rem; font-size: 0.85rem; }
-    .cart-box { background: #f6f8fa; border: 1px solid #d0d7de; border-radius: 8px; padding: 1.5rem; }
+    .cart-box { background: #ffffff; border: 1px solid #c3dcc7; border-radius: 8px; padding: 1.5rem; }
     .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0; border-bottom: 1px solid #e1e4e8; gap: 0.5rem; flex-wrap: wrap; }
     .cart-controls { display: flex; align-items: center; }
     .totals-box { margin-top: 1rem; padding-top: 0.5rem; }
@@ -103,16 +103,9 @@
 
     // Edit your products here (make sure each item ends with a comma except the last one)
     const products = [
-      { id: 1, name: "Sasquatch Testosterone E", price: 30.00, desc: "300mg/ml" },
-      { id: 2, name: "Sasquatch Testosterone C", price: 35.00, desc: "250mg/ml" },
-      { id: 3, name: "Sasquatch Testosterone P", price: 35.00, desc: "100mg/ml" },
-      { id: 4, name: "Sasquatch Testosterone A", price: 25.00, desc: "125mg/ml" },
-      { id: 5, name: "Sasquatch Sustanon 250", price: 45.00, desc: "250mg/ml" },
-      { id: 6, name: "Sasquatch Eq-Boldenone Undecylenate", price: 55.00, desc: "300mg/ml" },
-      { id: 7, name: "Sasquatch Nandrolone Decanoate", price: 30.00, desc: "300mg/ml" },
-      { id: 8, name: "Sasquatch Trenbolone E", price: 65.00, desc: "250mg/ml" },
-      { id: 9, name: "Sasquatch Masteron E", price: 70.00, desc: "200mg/ml" }
-
+      { id: 1, name: "Canvas Tote Bag", price: 18.00, desc: "Heavyweight cotton tote." },
+      { id: 2, name: "Ceramic Coffee Mug", price: 14.50, desc: "12 oz speckled glaze mug." },
+      { id: 3, name: "Enamel Pin Set", price: 10.00, desc: "Pack of three custom pins." }
     ];
 
     let cart = [];
@@ -237,7 +230,7 @@
 
         if (!val) {
           el.classList.add("input-error");
-          missing.push(f.label);
+      missing.push(f.label);
       } else if (f.id === "cust-email" && (!val.includes("@") || !val.includes("."))) {
       el.classList.add("input-error");
       missing.push("Valid Email Address");
