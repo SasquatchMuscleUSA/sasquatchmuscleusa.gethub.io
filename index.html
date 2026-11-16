@@ -11,15 +11,22 @@
     button { background: #0969da; color: white; border: none; padding: 0.6rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.95rem; margin-right: 0.5rem; margin-top: 0.5rem; }
     button:hover { background: #0550ae; }
     button.secondary { background: #6e7781; }
+    button.secondary:hover { background: #57606a; }
     button.success { background: #1a7f37; }
     button.success:hover { background: #116329; }
+    button.danger { background: #cf222e; }
+    button.danger:hover { background: #a40e26; }
+    button.qty-btn { padding: 0.25rem 0.6rem; margin: 0 0.25rem; font-size: 0.85rem; }
     .cart-box { background: #f6f8fa; border: 1px solid #d0d7de; border-radius: 8px; padding: 1.5rem; }
-    .cart-item { display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid #e1e4e8; }
+    .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0; border-bottom: 1px solid #e1e4e8; gap: 0.5rem; flex-wrap: wrap; }
+    .cart-controls { display: flex; align-items: center; }
+    .totals-box { margin-top: 1rem; padding-top: 0.5rem; }
+    .totals-row { display: flex; justify-content: space-between; margin: 0.3rem 0; }
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin: 1rem 0; }
-    .form-grid input { width: 100%; padding: 0.55rem; border: 1px solid #d0d7de; border-radius: 6px; box-sizing: border-box; font-size: 0.95rem; }
+    .form-grid input, .form-grid select { width: 100%; padding: 0.55rem; border: 1px solid #d0d7de; border-radius: 6px; box-sizing: border-box; font-size: 0.95rem; background: white; }
     .full-width { grid-column: 1 / -1; }
     .city-state-zip { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 0.75rem; grid-column: 1 / -1; }
-    textarea { width: 100%; height: 220px; margin-top: 0.75rem; padding: 0.75rem; font-family: monospace; box-sizing: border-box; border-radius: 6px; border: 1px solid #d0d7de; }
+    textarea { width: 100%; height: 240px; margin-top: 0.75rem; padding: 0.75rem; font-family: monospace; box-sizing: border-box; border-radius: 6px; border: 1px solid #d0d7de; }
     .hidden { display: none; }
     @media (max-width: 550px) {
       .form-grid, .city-state-zip { grid-template-columns: 1fr; }
@@ -34,7 +41,21 @@
   <div class="cart-box">
     <h2>Your Cart</h2>
     <div id="cart-items"><p>Your cart is empty.</p></div>
-    <h3>Total: $<span id="cart-total">0.00</span></h3>
+
+    <div class="totals-box">
+      <div class="totals-row">
+        <span>Subtotal:</span>
+        <span>$<span id="cart-subtotal">0.00</span></span>
+      </div>
+      <div class="totals-row">
+        <span>Flat-Rate Shipping:</span>
+        <span>$<span id="cart-shipping">0.00</span></span>
+      </div>
+      <div class="totals-row">
+        <h3>Total:</h3>
+        <h3>$<span id="cart-total">0.00</span></h3>
+      </div>
+    </div>
 
     <h3>Customer Details</h3>
     <div class="form-grid">
@@ -46,6 +67,11 @@
         <input type="text" id="cust-state" placeholder="State" required>
         <input type="text" id="cust-zip" placeholder="Zip Code" required>
       </div>
+      <select id="cust-payment" class="full-width">
+        <option value="" disabled selected>Select Payment Method</option>
+        <option value="Bitcoin">Bitcoin</option>
+        <option value="Ethereum">Ethereum</option>
+      </select>
     </div>
 
     <button onclick="generateOrder()">Submit & Generate Order</button>
@@ -65,7 +91,10 @@
     // 1. Replace this with the email address where you want to receive orders
     const storeEmail = "orders@example.com";
 
-    // 2. Edit your products, prices, and descriptions here
+    // 2. Flat-rate shipping fee
+    const flatShippingRate = 20.00;
+
+    // 3. Edit your products, prices, and descriptions here
     const products = [
       { id: 1, name: "Sasquatch Testosterone E", price: 30.00, desc: "300mg/ml" },
       { id: 2, name: "Sasquatch Testosterone C", price: 35.00, desc: "250mg/ml" },
@@ -76,6 +105,7 @@
       { id: 7, name: "Sasquatch Nandrolone Decanoate", price: 30.00, desc: "300mg/ml" },
       { id: 8, name: "Sasquatch Trenbolone E", price: 65.00, desc: "250mg/ml" },
       { id: 9, name: "Sasquatch Masteron E", price: 70.00, desc: "200mg/ml" }
+
     ];
 
     let cart = [];
@@ -107,26 +137,58 @@
       updateCart();
     }
 
+    function changeQty(id, delta) {
+      const item = cart.find(i => i.id === id);
+      if (!item) return;
+      item.qty += delta;
+      if (item.qty <= 0) {
+        removeItem(id);
+      } else {
+        updateCart();
+      }
+    }
+
+    function removeItem(id) {
+      cart = cart.filter(item => item.id !== id);
+      updateCart();
+    }
+
     function updateCart() {
       const container = document.getElementById("cart-items");
+      const subtotalEl = document.getElementById("cart-subtotal");
+      const shippingEl = document.getElementById("cart-shipping");
       const totalEl = document.getElementById("cart-total");
 
       if (cart.length === 0) {
         container.innerHTML = "<p>Your cart is empty.</p>";
+        subtotalEl.textContent = "0.00";
+        shippingEl.textContent = "0.00";
         totalEl.textContent = "0.00";
+        document.getElementById("output-section").classList.add("hidden");
         return;
       }
 
-      let total = 0;
+      let subtotal = 0;
       container.innerHTML = cart.map(item => {
         const lineTotal = item.price * item.qty;
-        total += lineTotal;
+        subtotal += lineTotal;
         return `<div class="cart-item">
-          <span>${item.name} (x${item.qty})</span>
-          <span>$${lineTotal.toFixed(2)}</span>
+          <div>
+            <strong>${item.name}</strong> ($${item.price.toFixed(2)} each)
+          </div>
+          <div class="cart-controls">
+            <button class="secondary qty-btn" onclick="changeQty(${item.id}, -1)">-</button>
+            <span style="min-width: 24px; text-align: center;">${item.qty}</span>
+            <button class="secondary qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
+            <span style="min-width: 75px; text-align: right; margin: 0 0.5rem;">$${lineTotal.toFixed(2)}</span>
+            <button class="danger qty-btn" onclick="removeItem(${item.id})">Remove</button>
+          </div>
         </div>`;
       }).join("");
 
+      const total = subtotal + flatShippingRate;
+      subtotalEl.textContent = subtotal.toFixed(2);
+      shippingEl.textContent = flatShippingRate.toFixed(2);
       totalEl.textContent = total.toFixed(2);
     }
 
@@ -142,8 +204,9 @@
       const city = document.getElementById("cust-city").value.trim() || "";
       const state = document.getElementById("cust-state").value.trim() || "";
       const zip = document.getElementById("cust-zip").value.trim() || "";
+      const payment = document.getElementById("cust-payment").value || "Not selected";
 
-      let total = 0;
+      let subtotal = 0;
       let lines = [
         "NEW ORDER REQUEST",
         "-------------------------",
@@ -151,17 +214,22 @@
         `Email: ${email}`,
         `Address: ${address}`,
         `City/State/Zip: ${city}, ${state} ${zip}`.trim(),
+        `Payment Method: ${payment}`,
         "-------------------------",
         "ITEMS:"
       ];
 
       cart.forEach(item => {
         const lineTotal = item.price * item.qty;
-        total += lineTotal;
+        subtotal += lineTotal;
         lines.push(`${item.qty}x ${item.name} @ $${item.price.toFixed(2)} = $${lineTotal.toFixed(2)}`);
       });
 
+      const total = subtotal + flatShippingRate;
+
       lines.push("-------------------------");
+      lines.push(`Subtotal: $${subtotal.toFixed(2)}`);
+      lines.push(`Shipping (Flat Rate): $${flatShippingRate.toFixed(2)}`);
       lines.push(`ORDER TOTAL: $${total.toFixed(2)}`);
 
       document.getElementById("order-text").value = lines.join("\n");
@@ -179,17 +247,3 @@
     function copyText() {
       const box = document.getElementById("order-text");
       box.select();
-      navigator.clipboard.writeText(box.value);
-      alert("Order copied! Paste it into your email.");
-    }
-
-    function clearCart() {
-      cart = [];
-      updateCart();
-      document.getElementById("output-section").classList.add("hidden");
-    }
-
-    renderProducts();
-  </script>
-</body>
-</html>
