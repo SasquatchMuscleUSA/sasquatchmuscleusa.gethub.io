@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Product Store</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; color: #222; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .card { border: 1px solid #ddd; border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; justify-content: space-between; }
+    button { background: #0969da; color: white; border: none; padding: 0.6rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.95rem; margin-right: 0.5rem; margin-top: 0.5rem; }
+    button:hover { background: #0550ae; }
+    button.secondary { background: #6e7781; }
+    button.success { background: #1a7f37; }
+    button.success:hover { background: #116329; }
+    .cart-box { background: #f6f8fa; border: 1px solid #d0d7de; border-radius: 8px; padding: 1.5rem; }
+    .cart-item { display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid #e1e4e8; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin: 1rem 0; }
+    .form-grid input { width: 100%; padding: 0.55rem; border: 1px solid #d0d7de; border-radius: 6px; box-sizing: border-box; font-size: 0.95rem; }
+    .full-width { grid-column: 1 / -1; }
+    .city-state-zip { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 0.75rem; grid-column: 1 / -1; }
+    textarea { width: 100%; height: 220px; margin-top: 0.75rem; padding: 0.75rem; font-family: monospace; box-sizing: border-box; border-radius: 6px; border: 1px solid #d0d7de; }
+    .hidden { display: none; }
+    @media (max-width: 550px) {
+      .form-grid, .city-state-zip { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Product Catalog</h1>
+  <div class="grid" id="product-list"></div>
+
+  <div class="cart-box">
+    <h2>Your Cart</h2>
+    <div id="cart-items"><p>Your cart is empty.</p></div>
+    <h3>Total: $<span id="cart-total">0.00</span></h3>
+
+    <h3>Customer Details</h3>
+    <div class="form-grid">
+      <input type="text" id="cust-name" placeholder="Full Name" required>
+      <input type="email" id="cust-email" placeholder="Email Address" required>
+      <input type="text" id="cust-address" class="full-width" placeholder="Street Address" required>
+      <div class="city-state-zip">
+        <input type="text" id="cust-city" placeholder="City" required>
+        <input type="text" id="cust-state" placeholder="State" required>
+        <input type="text" id="cust-zip" placeholder="Zip Code" required>
+      </div>
+    </div>
+
+    <button onclick="generateOrder()">Submit & Generate Order</button>
+    <button class="secondary" onclick="clearCart()">Clear Cart</button>
+
+    <div id="output-section" class="hidden">
+      <h4>Order Summary:</h4>
+      <textarea id="order-text" readonly></textarea>
+      <div>
+        <button class="success" onclick="sendViaEmail()">Send via Email</button>
+        <button onclick="copyText()">Copy to Clipboard</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 1. Replace this with the email address where you want to receive orders
+    const storeEmail = "orders@example.com";
+
+    // 2. Edit your products, prices, and descriptions here
+    const products = [
+      { id: 1, name: "Canvas Tote Bag", price: 18.00, desc: "Heavyweight cotton tote." },
+      { id: 2, name: "Ceramic Coffee Mug", price: 14.50, desc: "12 oz speckled glaze mug." },
+      { id: 3, name: "Enamel Pin Set", price: 10.00, desc: "Pack of three custom pins." }
+    ];
+
+    let cart = [];
+
+    function renderProducts() {
+      const list = document.getElementById("product-list");
+      list.innerHTML = products.map(p => `
+        <div class="card">
+          <div>
+            <h3>${p.name}</h3>
+            <p>${p.desc}</p>
+          </div>
+          <div>
+            <p><strong>$${p.price.toFixed(2)}</strong></p>
+            <button onclick="addToCart(${p.id})">Add to Cart</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function addToCart(id) {
+      const product = products.find(p => p.id === id);
+      const existing = cart.find(item => item.id === id);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        cart.push({ ...product, qty: 1 });
+      }
+      updateCart();
+    }
+
+    function updateCart() {
+      const container = document.getElementById("cart-items");
+      const totalEl = document.getElementById("cart-total");
+
+      if (cart.length === 0) {
+        container.innerHTML = "<p>Your cart is empty.</p>";
+        totalEl.textContent = "0.00";
+        return;
+      }
+
+      let total = 0;
+      container.innerHTML = cart.map(item => {
+        const lineTotal = item.price * item.qty;
+        total += lineTotal;
+        return `<div class="cart-item">
+          <span>${item.name} (x${item.qty})</span>
+          <span>$${lineTotal.toFixed(2)}</span>
+        </div>`;
+      }).join("");
+
+      totalEl.textContent = total.toFixed(2);
+    }
+
+    function generateOrder() {
+      if (cart.length === 0) {
+        alert("Please add at least one item to your cart first.");
+        return;
+      }
+
+      const name = document.getElementById("cust-name").value.trim() || "Not provided";
+      const email = document.getElementById("cust-email").value.trim() || "Not provided";
+      const address = document.getElementById("cust-address").value.trim() || "Not provided";
+      const city = document.getElementById("cust-city").value.trim() || "";
+      const state = document.getElementById("cust-state").value.trim() || "";
+      const zip = document.getElementById("cust-zip").value.trim() || "";
+
+      let total = 0;
+      let lines = [
+        "NEW ORDER REQUEST",
+        "-------------------------",
+        `Name: ${name}`,
+        `Email: ${email}`,
+        `Address: ${address}`,
+        `City/State/Zip: ${city}, ${state} ${zip}`.trim(),
+        "-------------------------",
+        "ITEMS:"
+      ];
+
+      cart.forEach(item => {
+        const lineTotal = item.price * item.qty;
+        total += lineTotal;
+        lines.push(`${item.qty}x ${item.name} @ $${item.price.toFixed(2)} = $${lineTotal.toFixed(2)}`);
+      });
+
+      lines.push("-------------------------");
+      lines.push(`ORDER TOTAL: $${total.toFixed(2)}`);
+
+      document.getElementById("order-text").value = lines.join("\n");
+      document.getElementById("output-section").classList.remove("hidden");
+    }
+
+    function sendViaEmail() {
+      const orderBody = document.getElementById("order-text").value;
+      const customerName = document.getElementById("cust-name").value.trim() || "Customer";
+      const subject = encodeURIComponent(`New Order from ${customerName}`);
+      const body = encodeURIComponent(orderBody);
+      window.location.href = `mailto:${storeEmail}?subject=${subject}&body=${body}`;
+    }
+
+    function copyText() {
+      const box = document.getElementById("order-text");
+      box.select();
+      navigator.clipboard.writeText(box.value);
+      alert("Order copied! Paste it into your email.");
+    }
+
+    function clearCart() {
+      cart = [];
+      updateCart();
+      document.getElementById("output-section").classList.add("hidden");
+    }
+
+    renderProducts();
+  </script>
+</body>
+</html>
