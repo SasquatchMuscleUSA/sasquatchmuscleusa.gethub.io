@@ -1,2 +1,2 @@
-# theicon-codr.gethub.io
-This is my 1st test shop
+# Sasquatch Store Front
+Sasquatch Muscle Store Page
