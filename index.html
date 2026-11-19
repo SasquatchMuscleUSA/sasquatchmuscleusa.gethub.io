@@ -8,11 +8,15 @@
     body { font-family: system-ui, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; color: #9E9D5A; background-color: #02090F; }
     .banner-wrapper { margin-bottom: 1.5rem; border-radius: 10px; overflow: hidden; border: 1px solid #c3dcc7; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12); background: #0f2419; }
     .banner-img { width: 100%; height: auto; display: block; object-fit: cover; }
+    .promo-subheader {display: inline-block; background-color: #163020;color: #ffea00;font-size: 1.1rem; font-weight: 700; padding: 0.45rem 0.9rem; border-radius: 6px; margin-top: -0.5rem; margin-bottom: 1.5rem; }
+    
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
     .card { background: #262B27; border: 1px solid #c3dcc7; border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; justify-content: space-between; }
     .product-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
     .product-header h3 { margin: 0; font-size: 1.05rem; }
     .product-thumb { width: 44px; height: 44px; object-fit: contain; border-radius: 6px; border: 1px solid #e1e4e8; background: #f6f8fa; flex-shrink: 0; }
+    .old-price {color: #8c959f; text-decoration: line-through; font-weight: normal; margin-left: 0.4rem; font-size: 0.95rem; }
+    
     .product-desc { margin: 0.25rem 0 0.75rem 0; color: #57606a; font-size: 0.9rem; }
     button { background: #593210; color: white; border: none; padding: 0.6rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.95rem; margin-right: 0.5rem; margin-top: 0.5rem; }
     button:hover { background: #0550ae; }
@@ -49,7 +53,8 @@
     <img src="SasquatchLargeBanner.jpg" alt="Sasquatch Muscle" class="banner-img">
   </div>
 
-  <h1>Product Catalog</h1>
+ <h1>Product Catalog</h1>
+  <div class="promo-subheader">For a limited time, enjoy SST Intro Pricing</div>
   <div class="grid" id="product-list"></div>
 
   <div class="cart-box">
@@ -118,26 +123,26 @@
 
     // Edit your products here (make sure each item ends with a comma except the last one)
     const products = [
-      { id: 1, image: "SasquatchIconThumbnail.png", name: "Sasquatch Testosterone E", price: 30.00, desc: "300mg/ml" },
-      { id: 2, image: "BasicsIconThumbnail.png", name: "BasicsAAS Testosterone E", price: 40.00, desc: "250mg/ml" },
-      { id: 3, image: "BasicsIconThumbnail.png", name: "BasicsAAS Testosterone E", price: 45.00, desc: "300mg/ml" },
-      { id: 4, image: "SasquatchIconThumbnail.png", name: "Sasquatch Testosterone C", price: 35.00, desc: "250mg/ml" },
-      { id: 5, image: "BasicsIconThumbnail.png", name: "BasicsAAS Testosterone C", price: 35.00, desc: "200mg/ml" },
-      { id: 6, image: "BasicsIconThumbnail.png", name: "BasicsAAS Testosterone C", price: 40.00, desc: "250mg/ml" },
-      { id: 7, image: "SasquatchIconThumbnail.png", name: "Sasquatch Testosterone P", price: 25.00, desc: "100mg/ml" },
-      { id: 8, image: "BasicsIconThumbnail.png", name: "BasicsAAS Testosterone P", price: 30.00, desc: "100mg/ml" },
-      { id: 9, image: "SasquatchIconThumbnail.png", name: "Sasquatch Testosterone A", price: 25.00, desc: "125mg/ml" },
-      { id: 10, image: "SasquatchIconThumbnail.png", name: "Sasquatch Sustanon 250", price: 45.00, desc: "250mg/ml" },
-      { id: 11, image: "BasicsIconThumbnail.png", name: "BasicsAAS Sustanon 250", price: 40.00, desc: "250mg/ml" },
-      { id: 12, image: "BasicsIconThumbnail.png", name: "BasicsAAS Sustanon 250", price: 45.00, desc: "300mg/ml" },
-      { id: 13, image: "SasquatchIconThumbnail.png", name: "Sasquatch Eq-Boldenone Undecylenate", price: 55.00, desc: "300mg/ml" },
-      { id: 14, image: "SasquatchIconThumbnail.png", name: "Sasquatch Nandrolone Decanoate", price: 55.00, desc: "200mg/ml" },
-      { id: 15, image: "BasicsIconThumbnail.png", name: "BasicsAAS Nandrolone Decanoate", price: 40.00, desc: "200mg/ml" },
-     // { id: 16, image: "BasicsIconThumbnail.png", name: "BasicsAAS Nandrolone Phenylpropionate", price: 40.00, desc: "150mg/ml" },
-      { id: 17, image: "SasquatchIconThumbnail.png", name: "Sasquatch Trenbolone E", price: 65.00, desc: "250mg/ml" },
-      { id: 18, image: "BasicsIconThumbnail.png", name: "BasicsAAS Trenbolone E", price: 55.00, desc: "200mg/ml" },
-      { id: 19, image: "BasicsIconThumbnail.png", name: "BasicsAAS Trenbolone A", price: 45.00, desc: "100mg/ml" },
-      { id: 20, image: "SasquatchIconThumbnail.png", name: "Sasquatch Masteron E", price: 70.00, desc: "200mg/ml" }
+      { id: 1, image: "SasquatchIconThumbnail.png", name: "Sasquatch Testosterone E", price: 30.00, oldPrice: 40.00, desc: "300mg/ml" },
+      { id: 2, image: "BasicsIconThumbnail.png", name: "BasicsAAS Testosterone E", price: 40.00, oldPrice: 40.00,desc: "250mg/ml" },
+      { id: 3, image: "BasicsIconThumbnail.png", name: "BasicsAAS Testosterone E", price: 45.00, oldPrice: 40.00,desc: "300mg/ml" },
+      { id: 4, image: "SasquatchIconThumbnail.png", name: "Sasquatch Testosterone C", price: 35.00, oldPrice: 40.00,desc: "250mg/ml" },
+      { id: 5, image: "BasicsIconThumbnail.png", name: "BasicsAAS Testosterone C", price: 35.00, oldPrice: 40.00,desc: "200mg/ml" },
+      { id: 6, image: "BasicsIconThumbnail.png", name: "BasicsAAS Testosterone C", price: 40.00, oldPrice: 40.00,desc: "250mg/ml" },
+      { id: 7, image: "SasquatchIconThumbnail.png", name: "Sasquatch Testosterone P", price: 25.00, oldPrice: 40.00,desc: "100mg/ml" },
+      { id: 8, image: "BasicsIconThumbnail.png", name: "BasicsAAS Testosterone P", price: 30.00, oldPrice: 40.00,desc: "100mg/ml" },
+      { id: 9, image: "SasquatchIconThumbnail.png", name: "Sasquatch Testosterone A", price: 25.00, oldPrice: 40.00,desc: "125mg/ml" },
+      { id: 10, image: "SasquatchIconThumbnail.png", name: "Sasquatch Sustanon 250", price: 45.00, oldPrice: 40.00,desc: "250mg/ml" },
+      { id: 11, image: "BasicsIconThumbnail.png", name: "BasicsAAS Sustanon 250", price: 40.00, oldPrice: 40.00,desc: "250mg/ml" },
+      { id: 12, image: "BasicsIconThumbnail.png", name: "BasicsAAS Sustanon 250", price: 45.00, oldPrice: 40.00,desc: "300mg/ml" },
+      { id: 13, image: "SasquatchIconThumbnail.png", name: "Sasquatch Eq-Boldenone Undecylenate", price: 55.00, oldPrice: 40.00,desc: "300mg/ml" },
+      { id: 14, image: "SasquatchIconThumbnail.png", name: "Sasquatch Nandrolone Decanoate", price: 55.00, oldPrice: 40.00,desc: "200mg/ml" },
+      { id: 15, image: "BasicsIconThumbnail.png", name: "BasicsAAS Nandrolone Decanoate", price: 40.00, oldPrice: 40.00,desc: "200mg/ml" },
+     // { id: 16, image: "BasicsIconThumbnail.png", name: "BasicsAAS Nandrolone Phenylpropionate", price: 40.00, oldPrice: 40.00,desc: "150mg/ml" },
+      { id: 17, image: "SasquatchIconThumbnail.png", name: "Sasquatch Trenbolone E", price: 65.00, oldPrice: 40.00,desc: "250mg/ml" },
+      { id: 18, image: "BasicsIconThumbnail.png", name: "BasicsAAS Trenbolone E", price: 55.00, oldPrice: 40.00,desc: "200mg/ml" },
+      { id: 19, image: "BasicsIconThumbnail.png", name: "BasicsAAS Trenbolone A", price: 45.00, oldPrice: 40.00,desc: "100mg/ml" },
+      { id: 20, image: "SasquatchIconThumbnail.png", name: "Sasquatch Masteron E", price: 70.00, oldPrice: 40.00,desc: "200mg/ml" }
 
     ];
 
@@ -153,32 +158,31 @@
       return "ORD-" + year + month + day + "-" + randomPart;
     }
 
-    function renderProducts() {
-        const list = document.getElementById("product-list");
-        if (!list) return;
-      
-        list.innerHTML = products.map(function(p) {
-          // 1. Creates the <img> tag only if the product has an image filename
-          const imgHtml = p.image ? `<img src="${p.image}" alt="${p.name}" class="product-thumb">` : "";
-      
-          // 2. Places the <img> tag inside .product-header right next to the <h3> title
-          return `
-            <div class="card">
-              <div>
-                <div class="product-header">
-                  ${imgHtml}
-                  <h3>${p.name}</h3>
-                </div>
-                <p>${p.desc}</p>
-              </div>
-              <div>
-                <p><strong>$${Number(p.price).toFixed(2)}</strong></p>
-                <button type="button" onclick="addToCart(${p.id})">Add to Cart</button>
-              </div>
-            </div>
-          `;
-        }).join("");
-      }
+function renderProducts() {
+  const list = document.getElementById("product-list");
+  if (!list) return;
+
+  list.innerHTML = products.map(function(p) {
+    const imgHtml = p.image ? `<img src="${p.image}" alt="${p.name}" class="product-thumb">` : "";
+    const oldPriceHtml = p.oldPrice ? `<span class="old-price">$${Number(p.oldPrice).toFixed(2)}</span>` : "";
+
+    return `
+      <div class="card">
+        <div>
+          <div class="product-header">
+            ${imgHtml}
+            <h3>${p.name}</h3>
+          </div>
+          <p class="product-desc">${p.desc}</p>
+        </div>
+        <div>
+          <p><strong>$${Number(p.price).toFixed(2)}</strong>${oldPriceHtml}</p>
+          <button type="button" onclick="addToCart(${p.id})">Add to Cart</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
 
     function addToCart(id) {
       const product = products.find(function(p) { return p.id === id; });
